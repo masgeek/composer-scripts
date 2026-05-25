@@ -11,7 +11,7 @@ class ArtisanTest extends TestCase
     {
         $project = $this->createTempDir();
         $vendorBin = $project . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'bin';
-        $artisan = $vendorBin . DIRECTORY_SEPARATOR . 'artisan.bat';
+        $artisan = $vendorBin . DIRECTORY_SEPARATOR . $this->scriptName('artisan');
 
         $this->writeFile($artisan, 'binary');
         $this->writeFile($project . DIRECTORY_SEPARATOR . 'artisan', '<?php');
@@ -55,7 +55,7 @@ class ArtisanTest extends TestCase
         $project = $this->createTempDir();
         $vendorBin = $project . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'bin';
         $log = $project . DIRECTORY_SEPARATOR . 'artisan.log';
-        $artisan = $vendorBin . DIRECTORY_SEPARATOR . 'artisan.bat';
+        $artisan = $vendorBin . DIRECTORY_SEPARATOR . $this->scriptName('artisan');
 
         $this->createLoggingBatch($artisan, $log);
 
