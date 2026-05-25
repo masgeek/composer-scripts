@@ -131,22 +131,24 @@ abstract class TestCase extends PhpUnitTestCase
             // argument in double-quotes so the output is unambiguous and matches
             // the platform-normalised form used in test assertions.
             $escaped = str_replace("'", "'\\''", $logFile);
+            // Use single-quoted PHP strings for lines that contain shell ${var}
+            // references to avoid PHP 8.2+ deprecated-interpolation warnings.
             $this->writeFile(
                 $path,
                 "#!/bin/sh\n"
                 . "_sep=''\n"
                 . "_out=''\n"
                 . "for _arg; do\n"
-                . "    case \"\$_arg\" in\n"
-                . "        *' '*) _out=\"\${_out}\${_sep}\\\"\\${_arg}\\\"\" ;;\n"
-                . "        *)     _out=\"\${_out}\${_sep}\${_arg}\" ;;\n"
+                . "    case \"$_arg\" in\n"
+                . '        *\' \'*) _out="${_out}${_sep}\"${_arg}\"" ;;' . "\n"
+                . '        *)     _out="${_out}${_sep}${_arg}" ;;' . "\n"
                 . "    esac\n"
                 . "    _sep=' '\n"
                 . "done\n"
-                . "if [ -z \"\$_out\" ]; then\n"
+                . "if [ -z \"$_out\" ]; then\n"
                 . "    printf '\\n' >> '{$escaped}'\n"
                 . "else\n"
-                . "    printf '%s\\n' \"\$_out\" >> '{$escaped}'\n"
+                . "    printf '%s\\n' \"$_out\" >> '{$escaped}'\n"
                 . "fi\n"
                 . "exit {$exitCode}\n"
             );
