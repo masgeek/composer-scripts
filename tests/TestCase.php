@@ -112,6 +112,9 @@ abstract class TestCase extends PhpUnitTestCase
     protected function createLoggingBatch(string $path, string $logFile, int $exitCode = 0): void
     {
         if (PHP_OS_FAMILY === 'Windows') {
+            // `echo %*` echoes the verbatim command-line string, including any
+            // double-quotes the caller passed. This preserves `=` signs that
+            // CMD would otherwise treat as token delimiters when using %~N.
             $this->writeFile(
                 $path,
                 "@echo off\r\n"
@@ -123,15 +126,27 @@ abstract class TestCase extends PhpUnitTestCase
                 . "exit /b {$exitCode}\r\n"
             );
         } else {
-            // POSIX: write a shell script and make it executable.
+            // POSIX: each positional param is an already-resolved argument value
+            // (shell has stripped surrounding quotes). Re-wrap any multi-word
+            // argument in double-quotes so the output is unambiguous and matches
+            // the platform-normalised form used in test assertions.
             $escaped = str_replace("'", "'\\''", $logFile);
             $this->writeFile(
                 $path,
                 "#!/bin/sh\n"
-                . "if [ \$# -eq 0 ]; then\n"
-                . "  printf '\\n' >> '{$escaped}'\n"
+                . "_sep=''\n"
+                . "_out=''\n"
+                . "for _arg; do\n"
+                . "    case \"\$_arg\" in\n"
+                . "        *' '*) _out=\"\${_out}\${_sep}\\\"\\${_arg}\\\"\" ;;\n"
+                . "        *)     _out=\"\${_out}\${_sep}\${_arg}\" ;;\n"
+                . "    esac\n"
+                . "    _sep=' '\n"
+                . "done\n"
+                . "if [ -z \"\$_out\" ]; then\n"
+                . "    printf '\\n' >> '{$escaped}'\n"
                 . "else\n"
-                . "  echo \"\$@\" >> '{$escaped}'\n"
+                . "    printf '%s\\n' \"\$_out\" >> '{$escaped}'\n"
                 . "fi\n"
                 . "exit {$exitCode}\n"
             );
