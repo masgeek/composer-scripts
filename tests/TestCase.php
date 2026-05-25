@@ -130,7 +130,7 @@ abstract class TestCase extends PhpUnitTestCase
         } else {
             // POSIX: each positional param is an already-resolved argument value
             // (shell has stripped surrounding quotes). Re-wrap any multi-word
-            // argument in double-quotes so the output is unambiguous and matches
+            // argument in double-quotes, so the output is unambiguous and matches
             // the platform-normalised form used in test assertions.
             //
             // Nowdoc (<<<'SHELL') prevents PHP from interpolating shell ${var}
