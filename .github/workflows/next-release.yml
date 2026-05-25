@@ -1,11 +1,15 @@
 name: NextRelease
+
 on:
-  merge_group:
-  push:
+  workflow_run:
+    workflows: ["UnitTests"]
+    types: [completed]
     branches:
-      - 'develop'
+      - develop
+
 jobs:
   next-release-pr:
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-24.04
     concurrency:
       cancel-in-progress: true
