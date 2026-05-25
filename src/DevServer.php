@@ -50,7 +50,7 @@ class DevServer
             . " \"php artisan serve --port={$port}\""
             . ' "php artisan queue:listen --tries=1"'
             . ' "npm run dev"'
-            . " --names='server,queue,vite'",
+            . ' --names=server,queue,vite',
         ]);
     }
 
