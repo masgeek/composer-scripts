@@ -115,43 +115,49 @@ abstract class TestCase extends PhpUnitTestCase
             // `echo %*` echoes the verbatim command-line string, including any
             // double-quotes the caller passed. This preserves `=` signs that
             // CMD would otherwise treat as token delimiters when using %~N.
-            $this->writeFile(
-                $path,
-                "@echo off\r\n"
-                . "if \"%~1\"==\"\" (\r\n"
-                . "  echo. >> \"{$logFile}\"\r\n"
-                . ") else (\r\n"
-                . "  echo %* >> \"{$logFile}\"\r\n"
-                . ")\r\n"
-                . "exit /b {$exitCode}\r\n"
-            );
+            // str_replace converts LF → CRLF for proper Windows batch line endings.
+            $bat = <<<BAT
+                @echo off
+                if "%~1"=="" (
+                  echo. >> "{$logFile}"
+                ) else (
+                  echo %* >> "{$logFile}"
+                )
+                exit /b {$exitCode}
+                BAT;
+
+            $this->writeFile($path, str_replace("\n", "\r\n", $bat));
         } else {
             // POSIX: each positional param is an already-resolved argument value
             // (shell has stripped surrounding quotes). Re-wrap any multi-word
             // argument in double-quotes so the output is unambiguous and matches
             // the platform-normalised form used in test assertions.
+            //
+            // Nowdoc (<<<'SHELL') prevents PHP from interpolating shell ${var}
+            // references, avoiding the PHP 8.2 deprecated-interpolation warning.
+            // __LOG__ and __EXIT__ are substituted after the fact.
             $escaped = str_replace("'", "'\\''", $logFile);
-            // Use single-quoted PHP strings for lines that contain shell ${var}
-            // references to avoid PHP 8.2+ deprecated-interpolation warnings.
-            $this->writeFile(
-                $path,
-                "#!/bin/sh\n"
-                . "_sep=''\n"
-                . "_out=''\n"
-                . "for _arg; do\n"
-                . "    case \"$_arg\" in\n"
-                . '        *\' \'*) _out="${_out}${_sep}\"${_arg}\"" ;;' . "\n"
-                . '        *)     _out="${_out}${_sep}${_arg}" ;;' . "\n"
-                . "    esac\n"
-                . "    _sep=' '\n"
-                . "done\n"
-                . "if [ -z \"$_out\" ]; then\n"
-                . "    printf '\\n' >> '{$escaped}'\n"
-                . "else\n"
-                . "    printf '%s\\n' \"$_out\" >> '{$escaped}'\n"
-                . "fi\n"
-                . "exit {$exitCode}\n"
-            );
+
+            $sh = <<<'SHELL'
+                #!/bin/sh
+                _sep=''
+                _out=''
+                for _arg; do
+                    case "$_arg" in
+                        *' '*) _out="${_out}${_sep}\"${_arg}\"" ;;
+                        *)     _out="${_out}${_sep}${_arg}" ;;
+                    esac
+                    _sep=' '
+                done
+                if [ -z "$_out" ]; then
+                    printf '\n' >> '__LOG__'
+                else
+                    printf '%s\n' "$_out" >> '__LOG__'
+                fi
+                exit __EXIT__
+                SHELL;
+
+            $this->writeFile($path, str_replace(['__LOG__', '__EXIT__'], [$escaped, $exitCode], $sh));
             chmod($path, 0755);
         }
     }
