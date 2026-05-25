@@ -1,0 +1,64 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "masgeek/composer-scripts",
+    "description": "Reusable Composer script callbacks for PHP projects — testing, linting, IDE helpers, and dev server. Framework-agnostic.",
+    "type": "composer-plugin",
+    "keywords": [
+        "composer",
+        "scripts",
+        "pest",
+        "pint",
+        "phpstan",
+        "linting",
+        "testing",
+        "ide-helper"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "masgeek",
+            "email": "dev@munywele.co.ke",
+            "homepage": "https://munywele.co.ke",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://munywele.co.ke",
+    "support": {
+        "email": "dev@munywele.co.ke",
+        "source": "https://github.com/masgeek/composer-scripts"
+    },
+    "require": {
+        "php": "^8.2",
+        "composer/composer": "^2.0",
+        "composer-plugin-api": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0|^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Masgeek\\ComposerScripts\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Masgeek\\ComposerScripts\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "class": "Masgeek\\ComposerScripts\\Plugin"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "masgeek/composer-scripts": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "vendor/bin/phpunit --no-coverage"
+    }
+}
