@@ -39,71 +39,62 @@ class Testing
     public static function run(Event $event): void
     {
         static::clearConfig($event);
-        $pest = Runner::requireBin($event, 'pest', 'pestphp/pest');
-        Runner::run($event, ["{$pest} --bail" . Runner::args($event)]);
+        static::pestRun($event, '--bail');
     }
 
     /** Unit tests only. */
     public static function unit(Event $event): void
     {
-        $pest = Runner::requireBin($event, 'pest', 'pestphp/pest');
-        Runner::run($event, ["{$pest} tests/Unit" . Runner::args($event)]);
+        static::pestRun($event, 'tests/Unit');
     }
 
     /** Feature tests only. */
     public static function feature(Event $event): void
     {
-        $pest = Runner::requireBin($event, 'pest', 'pestphp/pest');
-        Runner::run($event, ["{$pest} tests/Feature" . Runner::args($event)]);
+        static::pestRun($event, 'tests/Feature');
     }
 
     /** Controller tests only. */
     public static function controllers(Event $event): void
     {
-        $pest = Runner::requireBin($event, 'pest', 'pestphp/pest');
-        Runner::run($event, ["{$pest} tests/Feature/Http/Controllers" . Runner::args($event)]);
+        static::pestRun($event, 'tests/Feature/Http/Controllers');
     }
 
     /** Service tests only. */
     public static function services(Event $event): void
     {
-        $pest = Runner::requireBin($event, 'pest', 'pestphp/pest');
-        Runner::run($event, ["{$pest} tests/Unit/Services" . Runner::args($event)]);
+        static::pestRun($event, 'tests/Unit/Services');
     }
 
     /** Retry only previously-failed tests. */
     public static function retry(Event $event): void
     {
-        $pest = Runner::requireBin($event, 'pest', 'pestphp/pest');
-        Runner::run($event, ["{$pest} --retry --bail" . Runner::args($event)]);
+        static::pestRun($event, '--retry --bail');
     }
 
     /** Run only tests in files changed since the last commit. */
     public static function dirty(Event $event): void
     {
-        $pest = Runner::requireBin($event, 'pest', 'pestphp/pest');
-        Runner::run($event, ["{$pest} --dirty" . Runner::args($event)]);
+        static::pestRun($event, '--dirty');
     }
 
     /** CI test run — no bail so all failures are reported. */
     public static function ci(Event $event): void
     {
-        $pest = Runner::requireBin($event, 'pest', 'pestphp/pest');
-        Runner::run($event, ["{$pest}" . Runner::args($event)]);
+        static::pestRun($event);
     }
 
     /**
      * Bare Pest invocation — no default flags.
      *
-     * Intended for IDE / file-level runners that append a path argument, and as
+     * Intended for IDE / file-level runners that append a path argument and as
      * a general pass-through when you want full control over the flags:
      *
      *   composer test:file -- tests/Feature/SmsTest.php --filter=it_sends
      */
     public static function file(Event $event): void
     {
-        $pest = Runner::requireBin($event, 'pest', 'pestphp/pest');
-        Runner::run($event, ["{$pest}" . Runner::args($event)]);
+        static::pestRun($event);
     }
 
     /**
@@ -116,26 +107,34 @@ class Testing
      */
     public static function parallel(Event $event): void
     {
-        Artisan::run($event, 'test --parallel' . Runner::args($event));
+        Artisan::run($event, 'test --parallel');
     }
 
-    /** Run with HTML/text coverage report. */
+    /** Run with an HTML/text coverage report. */
     public static function coverage(Event $event): void
     {
-        $pest = Runner::requireBin($event, 'pest', 'pestphp/pest');
-        Runner::run($event, ["{$pest} --coverage" . Runner::args($event)]);
+        static::pestRun($event, '--coverage');
     }
 
     /** Run with Clover XML coverage output (for CI/SonarQube). */
     public static function coverageXml(Event $event): void
     {
-        $pest = Runner::requireBin($event, 'pest', 'pestphp/pest');
-        Runner::run($event, ["{$pest} --coverage-clover=storage/coverage/coverage.xml" . Runner::args($event)]);
+        static::pestRun($event, '--coverage-clover=storage/coverage/coverage.xml');
     }
 
     // -------------------------------------------------------------------------
 
-    /** Clear Laravel config cache before running tests (no-op on non-Laravel projects). */
+    /**
+     * Resolve the pest binary and run it with optional flags + any extra
+     * arguments the user passed after `--`.
+     */
+    private static function pestRun(Event $event, string $flags = ''): void
+    {
+        $pest = Runner::requireBin($event, 'pest', 'pestphp/pest');
+        Runner::run($event, [trim("{$pest} {$flags}") . Runner::args($event)]);
+    }
+
+    /** Clear the Laravel config cache before running tests (no-op on non-Laravel projects). */
     private static function clearConfig(Event $event): void
     {
         // Artisan::run() gracefully skips when artisan is not present

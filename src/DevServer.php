@@ -46,11 +46,11 @@ class DevServer
         $port = (int) (getenv('DEV_PORT') ?: 8000);
 
         Runner::run($event, [
-            'npx concurrently -c "#93c5fd,#c4b5fd,#fdba74"'
+            'npx concurrently'
             . " \"php artisan serve --port={$port}\""
             . ' "php artisan queue:listen --tries=1"'
             . ' "npm run dev"'
-            . " --names='server,queue,vite'",
+            . ' --names=server,queue,vite',
         ]);
     }
 
@@ -72,10 +72,8 @@ class DevServer
     {
         Config::disableProcessTimeout();
 
-        $args = Runner::args($event);
-
-        // Default to --queue=default when the caller passes no arguments
-        $flags = $args ?: ' --queue=default';
+        // Default to --queue=default when the caller passes no arguments.
+        $flags = $event->getArguments() ? '' : ' --queue=default';
 
         Artisan::run($event, 'queue:listen --timeout=0' . $flags);
     }
