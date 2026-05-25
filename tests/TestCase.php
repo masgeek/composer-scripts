@@ -98,18 +98,45 @@ abstract class TestCase extends PhpUnitTestCase
         return $composer;
     }
 
+    /**
+     * Return the platform-appropriate script filename for a given base name.
+     *
+     * On Windows the OS resolves bare names via PATHEXT, so we use a .bat wrapper.
+     * On POSIX systems we use a plain executable (no extension).
+     */
+    protected function scriptName(string $name): string
+    {
+        return PHP_OS_FAMILY === 'Windows' ? $name . '.bat' : $name;
+    }
+
     protected function createLoggingBatch(string $path, string $logFile, int $exitCode = 0): void
     {
-        $this->writeFile(
-            $path,
-            "@echo off\r\n"
-            . "if \"%~1\"==\"\" (\r\n"
-            . "  echo. >> \"{$logFile}\"\r\n"
-            . ") else (\r\n"
-            . "  echo %* >> \"{$logFile}\"\r\n"
-            . ")\r\n"
-            . "exit /b {$exitCode}\r\n"
-        );
+        if (PHP_OS_FAMILY === 'Windows') {
+            $this->writeFile(
+                $path,
+                "@echo off\r\n"
+                . "if \"%~1\"==\"\" (\r\n"
+                . "  echo. >> \"{$logFile}\"\r\n"
+                . ") else (\r\n"
+                . "  echo %* >> \"{$logFile}\"\r\n"
+                . ")\r\n"
+                . "exit /b {$exitCode}\r\n"
+            );
+        } else {
+            // POSIX: write a shell script and make it executable.
+            $escaped = str_replace("'", "'\\''", $logFile);
+            $this->writeFile(
+                $path,
+                "#!/bin/sh\n"
+                . "if [ \$# -eq 0 ]; then\n"
+                . "  printf '\\n' >> '{$escaped}'\n"
+                . "else\n"
+                . "  echo \"\$@\" >> '{$escaped}'\n"
+                . "fi\n"
+                . "exit {$exitCode}\n"
+            );
+            chmod($path, 0755);
+        }
     }
 
     protected function writeFile(string $path, string $contents): void
