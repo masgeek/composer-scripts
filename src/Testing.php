@@ -116,7 +116,7 @@ class Testing
      */
     public static function parallel(Event $event): void
     {
-        Artisan::run($event, 'test --parallel' . Runner::args($event));
+        Artisan::run($event, 'test --parallel');
     }
 
     /** Run with HTML/text coverage report. */

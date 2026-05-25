@@ -72,10 +72,8 @@ class DevServer
     {
         Config::disableProcessTimeout();
 
-        $args = Runner::args($event);
-
-        // Default to --queue=default when the caller passes no arguments
-        $flags = $args ?: ' --queue=default';
+        // Default to --queue=default when the caller passes no arguments.
+        $flags = $event->getArguments() ? '' : ' --queue=default';
 
         Artisan::run($event, 'queue:listen --timeout=0' . $flags);
     }
