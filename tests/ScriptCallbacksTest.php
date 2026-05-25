@@ -16,8 +16,8 @@ class ScriptCallbacksTest extends TestCase
         $vendorBin = $project . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'bin';
         $log = $project . DIRECTORY_SEPARATOR . 'quality.log';
 
-        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . 'pint.bat', $log);
-        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . 'phpstan.bat', $log);
+        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . $this->scriptName('pint'), $log);
+        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . $this->scriptName('phpstan'), $log);
 
         $event = $this->createEvent(
             $project . DIRECTORY_SEPARATOR . 'vendor',
@@ -48,8 +48,8 @@ class ScriptCallbacksTest extends TestCase
         $vendorBin = $project . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'bin';
         $log = $project . DIRECTORY_SEPARATOR . 'quality-all.log';
 
-        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . 'pint.bat', $log);
-        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . 'phpstan.bat', $log);
+        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . $this->scriptName('pint'), $log);
+        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . $this->scriptName('phpstan'), $log);
 
         $event = $this->createEvent($project . DIRECTORY_SEPARATOR . 'vendor', io: $this->createIoCollector());
 
@@ -67,7 +67,7 @@ class ScriptCallbacksTest extends TestCase
         $vendorBin = $project . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'bin';
         $log = $project . DIRECTORY_SEPARATOR . 'deps.log';
 
-        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . 'composer-unused.bat', $log);
+        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . $this->scriptName('composer-unused'), $log);
 
         Deps::checkUnused($this->createEvent($project . DIRECTORY_SEPARATOR . 'vendor', io: $this->createIoCollector()));
 
@@ -81,7 +81,7 @@ class ScriptCallbacksTest extends TestCase
         $log = $project . DIRECTORY_SEPARATOR . 'testing.log';
         $errors = [];
 
-        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . 'pest.bat', $log);
+        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . $this->scriptName('pest'), $log);
         chdir($project);
 
         $event = $this->createEvent(
@@ -125,7 +125,7 @@ class ScriptCallbacksTest extends TestCase
         $vendorBin = $project . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'bin';
         $log = $project . DIRECTORY_SEPARATOR . 'parallel.log';
 
-        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . 'artisan.bat', $log);
+        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . $this->scriptName('artisan'), $log);
 
         $event = $this->createEvent(
             $project . DIRECTORY_SEPARATOR . 'vendor',
@@ -145,7 +145,7 @@ class ScriptCallbacksTest extends TestCase
         $log = $project . DIRECTORY_SEPARATOR . 'ide-helper.log';
         $writes = [];
 
-        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . 'artisan.bat', $log);
+        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . $this->scriptName('artisan'), $log);
 
         $event = $this->createEvent(
             $project . DIRECTORY_SEPARATOR . 'vendor',
@@ -178,7 +178,7 @@ class ScriptCallbacksTest extends TestCase
         $vendorBin = $project . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'bin';
         $log = $project . DIRECTORY_SEPARATOR . 'model-gen.log';
 
-        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . 'artisan.bat', $log);
+        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . $this->scriptName('artisan'), $log);
         $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . 'pint.bat', $log);
 
         IdeHelper::modelGen($this->createEvent($project . DIRECTORY_SEPARATOR . 'vendor', io: $this->createIoCollector()));
@@ -196,7 +196,7 @@ class ScriptCallbacksTest extends TestCase
         $binDir = $project . DIRECTORY_SEPARATOR . 'bin';
         $log = $project . DIRECTORY_SEPARATOR . 'serve.log';
 
-        $this->createLoggingBatch($binDir . DIRECTORY_SEPARATOR . 'php.bat', $log);
+        $this->createLoggingBatch($binDir . DIRECTORY_SEPARATOR . $this->scriptName('php'), $log);
         $this->prependPath($binDir);
         putenv('DEV_PORT=9010');
         chdir($project);
@@ -228,8 +228,8 @@ class ScriptCallbacksTest extends TestCase
         $vendorBin = $project . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'bin';
         $log = $project . DIRECTORY_SEPARATOR . 'devserver.log';
 
-        $this->createLoggingBatch($binDir . DIRECTORY_SEPARATOR . 'npx.bat', $log);
-        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . 'artisan.bat', $log);
+        $this->createLoggingBatch($binDir . DIRECTORY_SEPARATOR . $this->scriptName('npx'), $log);
+        $this->createLoggingBatch($vendorBin . DIRECTORY_SEPARATOR . $this->scriptName('artisan'), $log);
         $this->prependPath($binDir);
         putenv('DEV_PORT=8123');
 
