@@ -11,8 +11,8 @@ class RunnerTest extends TestCase
     {
         $project = $this->createTempDir();
         $log = $project . DIRECTORY_SEPARATOR . 'commands.log';
-        $one = $project . DIRECTORY_SEPARATOR . 'one.bat';
-        $two = $project . DIRECTORY_SEPARATOR . 'two.bat';
+        $one = $project . DIRECTORY_SEPARATOR . $this->scriptName('one');
+        $two = $project . DIRECTORY_SEPARATOR . $this->scriptName('two');
 
         $this->createLoggingBatch($one, $log);
         $this->createLoggingBatch($two, $log);
@@ -31,7 +31,7 @@ class RunnerTest extends TestCase
     public function testRunThrowsWhenCommandFails(): void
     {
         $project = $this->createTempDir();
-        $failing = $project . DIRECTORY_SEPARATOR . 'fail.bat';
+        $failing = $project . DIRECTORY_SEPARATOR . $this->scriptName('fail');
 
         $this->createLoggingBatch($failing, $project . DIRECTORY_SEPARATOR . 'commands.log', 7);
 
