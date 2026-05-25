@@ -46,7 +46,7 @@ class DevServer
         $port = (int) (getenv('DEV_PORT') ?: 8000);
 
         Runner::run($event, [
-            'npx concurrently -c "#93c5fd,#c4b5fd,#fdba74"'
+            'npx concurrently'
             . " \"php artisan serve --port={$port}\""
             . ' "php artisan queue:listen --tries=1"'
             . ' "npm run dev"'
