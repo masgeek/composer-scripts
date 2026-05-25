@@ -242,7 +242,7 @@ class ScriptCallbacksTest extends TestCase
         ));
 
         self::assertSame([
-            'concurrently -c "#93c5fd,#c4b5fd,#fdba74" "php artisan serve --port=8123" "php artisan queue:listen --tries=1" "npm run dev" --names=\'server,queue,vite\'',
+            'concurrently -c #93c5fd,#c4b5fd,#fdba74 "php artisan serve --port=8123" "php artisan queue:listen --tries=1" "npm run dev" --names=server,queue,vite',
             'queue:listen --timeout=0 --queue=default',
             'queue:listen --timeout=0 --queue=high,default --sleep=3',
         ], $this->readLogLines($log));
